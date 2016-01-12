@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cardboard Example</title>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+ <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+      }
+      #example {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    </style> 
+  </head>
+  <body>
+    <div id="example"></div>
+
+
+  <script src="js/third-party/threejs/three.js"></script>
+  <script src="js/third-party/threejs/StereoEffect.js"></script>
+  <script src="js/third-party/threejs/DeviceOrientationControls.js"></script>
+  <script src="js/third-party/threejs/OrbitControls.js"></script>
+  <script src="js/third-party/threejs/Detector.js"></script> 
+  <script src="js/third-party/threejs/RoomObjs.js"></script>  
+
+  <script>
+    var camera, scene, renderer;
+    var effect, controls;
+    var element, container;
+    var sphere;
+    var selectedLink = null;
+    var currentRoom = null;
+    var magnificationFactor = 1.4;
+    var rooms = [];
+    var moveSprite = true;
+    var mouse = new THREE.Vector2(-1, -1);
+    var raycaster = new THREE.Raycaster();
+    var sphereIntersect = null;
+
+    var clock = new THREE.Clock();
+
+    setupRooms();
+    init();
+    setScene(rooms[0]);
+    animate();
+
+    function setupRooms(){
+      var r0 = new Room(0, "images/outsidehouse.jpg");
+      r0.links.push(new RoomLink(1,0,0));
+      rooms.push(r0);
+    }
+
+    function setScene(room){
+      currentRoom = room;
+
+      sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(100, 20, 20),
+        new THREE.MeshBasicMaterial({
+        map: THREE.ImageUtils.loadTexture(room.image)
+      })
+      );
+      sphere.material.side = THREE.DoubleSide
+    
+      sphere.scale.x = -1;
+      scene.add(sphere);
+
+      for(i = 0; i < room.links.length; i++)
+      {
+        if(room.links[i].linkSprite == null)
+        {
+          var texture = new THREE.Texture( generateLinkSprite() );
+          texture.needsUpdate = true; // important!
+
+          var material = new THREE.SpriteMaterial( { map: texture } );
+
+          room.links[i].linkSprite = new THREE.Sprite( material );
+          room.links[i].linkSprite.scale.set(10,10,10);
+
+        }
+
+        var distRadius = 90;
+        var theta = toRadians(room.links[i].theta);
+        var phi = toRadians(room.links[i].phi);
+
+        var cartesianPosition = sphericalToCartesian(distRadius, theta,phi);
+
+        room.links[i].linkSprite.position.set(cartesianPosition.x,cartesianPosition.y,cartesianPosition.z);
+        scene.add(room.links[i].linkSprite);
+
+      }
+
+    }
+
+    function generateLinkSprite()
+    {
+      var canvas = document.createElement( 'canvas' );
+      canvas.width = 200;
+      canvas.height = 200;
+
+      var context = canvas.getContext( '2d' );
+
+      var centerX = canvas.width / 2;
+      var centerY = canvas.height / 2;
+      var radius = 50;
+
+      context.beginPath();
+      context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+      context.fillStyle = '#F0C400';
+      context.fill();
+      context.lineWidth = 10;
+      context.strokeStyle = '#000000'; 
+      context.stroke();
+
+      return canvas; 
+    }
+
+    function sphericalToCartesian(radius, theta, phi)
+    {
+      var xPos = radius * Math.sin(theta) * Math.cos(phi);
+      var yPos = radius * Math.sin(theta) * Math.sin(phi);
+      var zPos = radius * Math.cos(theta);
+
+      return new THREE.Vector3(xPos,yPos,zPos);
+    }
+
+    function cartesianToSpherical(vec, r)
+    {
+      var theta = Math.acos(vec.z / r);
+      var phi = Math.atan2(vec.y, vec.x)
+
+      return new THREE.Vector2(toDegrees(theta) , toDegrees(phi));
+    }
+
+    function keyDownEvent(event)
+    {
+      window.onkeyup = function(e) {
+        var key = e.keyCode ? e.keyCode : e.which;
+        console.log(key);
+
+        if(key == 77)
+        {
+          console.log(sphereIntersect);
+        }
+      }
+    }
+
+    function mouseMoveEvent(event)
+    {
+      mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+      mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+      raycaster.setFromCamera( mouse, camera ); 
+
+         // calculate objects intersecting the picking ray
+      var intersects = raycaster.intersectObjects( scene.children );
+
+      for ( var i = 0; i < intersects.length; i++ ) {
+        if(intersects[ i ].object == sphere){
+          // console.log(intersects[ i ].point);
+
+          sphereIntersect = cartesianToSpherical(intersects[i].point,90);
+
+          moveLinkSprite();
+
+         }
+      }
+
+    }
+
+    function moveLinkSprite()
+      {
+        var distRadius = 90;
+        var theta = toRadians(sphereIntersect.x);
+        var phi = toRadians(sphereIntersect.y);
+
+        var cartesianPosition = sphericalToCartesian(distRadius, theta,phi);
+
+        rooms[0].links[0].linkSprite.position.set(cartesianPosition.x,cartesianPosition.y,cartesianPosition.z);
+      }
+
+    function init() {
+
+      window.onkeyup = keyDownEvent;
+      window.onmousemove = mouseMoveEvent;
+
+      renderer = new THREE.WebGLRenderer();
+
+
+      element = renderer.domElement;
+      container = document.getElementById('example');
+      container.appendChild(element);
+
+      effect = new THREE.StereoEffect(renderer);
+
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+      camera.position.set(0, 0.01, 0);
+      scene.add(camera);
+
+      controls = new THREE.OrbitControls(camera, element);
+      // controls.rotateUp(Math.PI / 4);
+      controls.target.set(
+        camera.position.x,
+        camera.position.y,
+        camera.position.z + 0.1
+      );
+      controls.noZoom = true;
+      controls.noPan = true;
+      controls.enabled = true;
+
+      window.addEventListener('resize', resize, false);
+      setTimeout(resize, 1);
+    }
+
+    function toRadians (angle) {
+      return angle * (Math.PI / 180);
+    }
+
+    function toDegrees (radians) {
+      return radians * 180 / Math.PI;
+    }
+
+    function resize() {
+      var width = container.offsetWidth;
+      var height = container.offsetHeight;
+
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(width, height);
+      effect.setSize(width, height);
+    }
+
+    function update(dt) {
+      resize();
+
+      camera.updateProjectionMatrix();
+
+      controls.update(dt);
+    }
+
+    function render(dt) {
+      renderer.render(scene,camera);
+      // effect.render(scene, camera);
+    }
+
+    function animate(t) {
+      requestAnimationFrame(animate);
+
+        //       raycaster.setFromCamera( mouse, camera ); 
+
+        //  // calculate objects intersecting the picking ray
+        // var intersects = raycaster.intersectObjects( scene.children );
+        // console.log(intersects.length);
+
+        // for ( var i = 0; i < intersects.length; i++ ) {
+        //   console.log(i);
+        //   if(intersects[ i ].object == sphere)
+        //     console.log("hit");
+  
+        // }
+
+
+      update(clock.getDelta());
+      render(clock.getDelta());
+    }
+
+
+
+    function fullscreen() {
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+      } else if (container.mozRequestFullScreen) {
+        container.mozRequestFullScreen();
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      }
+    }
+
+    function switchPhotos()
+    {
+
+      if(selectedLink != null)
+      {
+        clearScene();
+        currentRoom = null;
+        // console.log(selectedLink.toId);
+        setScene(rooms[selectedLink.toId]);
+        selectedLink = null;
+      }
+    }
+
+    function clearScene()
+    {
+      scene.remove(sphere);
+      sphere.material.map.dispose();
+      sphere.material.dispose();
+      sphere.geometry.dispose();
+
+      for(i = 0; i < currentRoom.links.length; i++)
+      { 
+        scene.remove(currentRoom.links[i].linkSprite);
+        currentRoom.links[i].linkSprite.geometry.dispose();  
+        currentRoom.links[i].linkSprite.material.dispose();  
+      }
+    }
+
+    function makeTextSprite( message, parameters )
+    {
+        if ( parameters === undefined ) parameters = {};
+        var fontface = parameters.hasOwnProperty("fontface") ? parameters["fontface"] : "Arial";
+        var fontsize = parameters.hasOwnProperty("fontsize") ? parameters["fontsize"] : 18;
+        var borderThickness = parameters.hasOwnProperty("borderThickness") ? parameters["borderThickness"] : 4;
+        var borderColor = parameters.hasOwnProperty("borderColor") ?parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
+        var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
+        var textColor = parameters.hasOwnProperty("textColor") ?parameters["textColor"] : { r:0, g:0, b:0, a:1.0 };
+
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        context.font = "Bold " + fontsize + "px " + fontface;
+        var metrics = context.measureText( message );
+        var textWidth = metrics.width;
+
+        context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
+        context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
+
+        context.lineWidth = borderThickness;
+        roundRect(context, borderThickness/2, borderThickness/2, (textWidth + borderThickness) * 1.1, fontsize * 1.4 + borderThickness, 8);
+
+        context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", 1.0)";
+        context.fillText( message, borderThickness, fontsize + borderThickness);
+
+        var texture = new THREE.Texture(canvas) 
+        texture.needsUpdate = true;
+
+        var spriteMaterial = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: false } );
+        var sprite = new THREE.Sprite( spriteMaterial );
+        sprite.scale.set(0.5 * fontsize, 0.25 * fontsize, 0.75 * fontsize);
+        return sprite;  
+    }
+
+    function roundRect(ctx, x, y, w, h, r) { 
+      ctx.beginPath(); ctx.moveTo(x + r, y); 
+      ctx.lineTo(x + w - r, y); 
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath(); ctx.fill(); ctx.stroke(); 
+    }
+  </script>
+  </body>
+</html>
