@@ -203,10 +203,12 @@
 
           room.featureBubbles[i].backgroundSprite = new THREE.Sprite( material );
           /* Why scale the sprite link here when you can just increase the size of the canvas */
-          room.featureBubbles[i].backgroundSprite.scale.set(10,10,10);
+          console.log("scale x: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z: " + room.featureBubbles[i].backgroundSprite.scale.z);
+          room.featureBubbles[i].backgroundSprite.scale.set(50,20,0);
+           console.log("scale x after: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y after: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z after: " + room.featureBubbles[i].backgroundSprite.scale.z);
         }
 
-        var distRadius = 90;
+        var distRadius = 70;
         var theta = toRadians(room.featureBubbles[i].theta);
         var phi = toRadians(room.featureBubbles[i].phi);
 
@@ -243,24 +245,22 @@
     function generateFeatureBubbleBackground(featureText)
     {
       var canvas = document.createElement( 'canvas' );
-      canvas.width = 200;
-      canvas.height = 200;
+      canvas.width = 500;
+      canvas.height = 300;
 
       var context = canvas.getContext( '2d' );
 
       var centerX = canvas.width / 2;
-      var centerY = canvas.height / 2;  
+      var centerY = canvas.height / 2;
 
+      roundRect(context, 0,0,canvas.width, canvas.height, 90.0);  
+      // context.rect(0, 0, canvas.width, canvas.height);
+      // context.stroke();
       context.beginPath();
-      context.rect(0, 0, canvas.width, canvas.height);
-      context.fillStyle = '#66CD00';
-      context.fill();
-      context.lineWidth = 10;
-      context.strokeStyle = '#000000'; 
-      context.stroke();
       context.font = "Bold 35px Arial";
       context.fillStyle = '#000000';
-      context.fillText(featureText, 0, centerY);
+      wrapText(context, featureText, 100, 100, canvas.width, canvas.height);
+      // context.fillText(featureText, 0, centerY);
 
 
 //       var textCanvas = document.createElement('div');
@@ -571,7 +571,33 @@
       ctx.lineTo(x + r, y + h);
       ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r);
       ctx.quadraticCurveTo(x, y, x + r, y);
+      // ctx.fillStyle = '#66CD00';
+      ctx.fillStyle = "rgba(127, 255, 0, 0.5)";
+      ctx.fill();
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#000000'; 
       ctx.closePath(); ctx.fill(); ctx.stroke(); 
+    }
+
+    function wrapText(context, text, x, y, maxWidth, lineHeight) 
+    {
+        var words = text.split(' ');
+        var line = '';
+
+        for(var n = 0; n < words.length; n++) {
+          var testLine = line + words[n] + ' ';
+          var metrics = context.measureText(testLine);
+          var testWidth = metrics.width;
+          if (testWidth > maxWidth && n > 0) {
+            context.fillText(line, x, y);
+            line = words[n] + ' ';
+            y += lineHeight;
+          }
+          else {
+            line = testLine;
+          }
+        }
+        context.fillText(line, x, y);
     }
   </script>
   </body>
