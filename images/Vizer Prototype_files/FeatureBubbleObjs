@@ -1,0 +1,12 @@
+"use strict";
+
+class FeatureBubble{
+	constructor(id, theta, phi, bubbleSize, informationText)
+	{
+		"use strict";
+		this.id = id;
+		this.theta = theta;
+		this.bubbleSize = bubbleSize;
+		this.informationText = informationText;
+	}
+}

@@ -82,7 +82,7 @@
       // rooms.push(r3);
 
       /********* HOUSE *********/
-      var r0 = new Room(0, "images/foyer.JPG");
+      var r0 = new Room(0, "images\\foyer.JPG");
       r0.links.push(new RoomLink(1,165.65,-141.73));
       r0.links.push(new RoomLink(7,28.24,-170.39));
       r0.links.push(new RoomLink(8,85.04,138.92));
@@ -90,52 +90,52 @@
 
       rooms.push(r0);
 
-      var r1 = new Room(1, "images/diningarea.JPG");
+      var r1 = new Room(1, "images\\diningarea.JPG");
       r1.links.push(new RoomLink(0,16.72,-35.95));
       r1.links.push(new RoomLink(2,73.83,179.81));
       r1.links.push(new RoomLink(7,15.78,-172.19));
       rooms.push(r1);
 
-      var r2 = new Room(2, "images/kitchen.JPG");
+      var r2 = new Room(2, "images\\kitchen.JPG");
       r2.links.push(new RoomLink(1,105.81,-6.07));
       r2.links.push(new RoomLink(4,81.215,-178.21));
       r2.links.push(new RoomLink(3,17.33,-37.18));
       rooms.push(r2);
 
-      var r3 = new Room(3, "images/livingroom.JPG");
+      var r3 = new Room(3, "images\\livingroom.JPG");
       r3.links.push(new RoomLink(2,163.71,-177.65));
       r3.links.push(new RoomLink(7,90.89,-8.67));
       r3.links.push(new RoomLink(4,90.57,-178.83));
       rooms.push(r3);
 
-      var r4 = new Room(4, "images/backyard.JPG");
+      var r4 = new Room(4, "images\\backyard.JPG");
       r4.links.push(new RoomLink(2,95.32,4.83));
       r4.links.push(new RoomLink(3,75.79, 4.76));
       rooms.push(r4);
 
-      var r5 = new Room(5, "images/frontdoor.JPG");
+      var r5 = new Room(5, "images\\frontdoor.JPG");
       r5.links.push(new RoomLink(0,85.41,174.68));
       r5.links.push(new RoomLink(9,72.07,-1.74));
       rooms.push(r5);
 
-      var r6 = new Room(6, "images/bathroom.JPG");
+      var r6 = new Room(6, "images\\bathroom.JPG");
       r6.links.push(new RoomLink(7,174.51,-103.87));
       rooms.push(r6);
 
-      var r7 = new Room(7, "images/hallway.JPG");
+      var r7 = new Room(7, "images\\hallway.JPG");
       r7.links.push(new RoomLink(6,3.22,-81.46));
       r7.links.push(new RoomLink(0,151.39,-7.97));
       r7.links.push(new RoomLink(3,90.71,-175.89));
       rooms.push(r7);
 
-      var r8 = new Room(8, "images/secondfloor.JPG");
+      var r8 = new Room(8, "images\\secondfloor.JPG");
       r8.links.push(new RoomLink(0,102.08,-37.81));
       rooms.push(r8); 
 
-      var r9 = new Room(9, "images/outsidehouse.JPG");
+      var r9 = new Room(9, "images\\outsidehouse.JPG");
       r9.links.push(new RoomLink(5,109.65,175.75));
+      r9.featureBubbles.push(new FeatureBubble(1,85.41,174.68, 'Here Lies Shrek.'));
       rooms.push(r9); 
-
     }
 
     function setScene(room){
@@ -147,12 +147,14 @@
         map: THREE.ImageUtils.loadTexture(room.image)
       })
       );
+      /* Why are we applying a linear filter? do texels not map directly to pixels? */
       sphere.material.map.minFilter = THREE.LinearFilter;
-    
+      
       sphere.scale.x = -1;
       scene.add(sphere);
 
       addLinksToScene(room);
+      addFeatureBubblesToScene(room);
     }
 
     function addLinksToScene(room)
@@ -163,10 +165,13 @@
         {
           var texture = new THREE.Texture( generateLinkSprite() );
           texture.needsUpdate = true; // important!
+          /* Why is this important*/
 
+          /* Can you apply a texture as a texure map itself?*/
           var material = new THREE.SpriteMaterial( { map: texture } );
 
           room.links[i].linkSprite = new THREE.Sprite( material );
+          /* Why scale the sprite link here when you can just increase the size of the canvas */
           room.links[i].linkSprite.scale.set(10,10,10);
 
         }
@@ -183,27 +188,33 @@
       }
     }
 
-    function generateLinkCircleMesh()
+    function addFeatureBubblesToScene(room)
     {
-      var radius = 5,
-      segments = 64,
-      material = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide } );
-      geometry = new THREE.CircleGeometry( radius, segments );
+      for(i = 0; i < room.featureBubbles.length; i++)
+      {
+        if(room.featureBubbles[i].backgroundSprite == null)
+        {
+          var texture = new THREE.Texture( generateFeatureBubbleBackground(room.featureBubbles[i].informationText) );
+          texture.needsUpdate = true; // important!
+          /* Why is this important*/
 
-      // Remove center vertex
-      geometry.vertices.shift();
+          /* Can you apply a texture as a texure map itself?*/
+          var material = new THREE.SpriteMaterial( { map: texture } );
 
-      var distRadius = 90;
-      var theta = toRadians(room.links[i].theta);
-      var phi = toRadians(room.links[i].phi);
+          room.featureBubbles[i].backgroundSprite = new THREE.Sprite( material );
+          /* Why scale the sprite link here when you can just increase the size of the canvas */
+          room.featureBubbles[i].backgroundSprite.scale.set(10,10,10);
+        }
 
-      var cartesianPosition = sphericalToCartesian(distRadius, theta,phi);
+        var distRadius = 90;
+        var theta = toRadians(room.featureBubbles[i].theta);
+        var phi = toRadians(room.featureBubbles[i].phi);
 
-      circleMesh = new THREE.Mesh( geometry, material );
-      circleMesh.position.set(cartesianPosition.x, cartesianPosition.y, cartesianPosition.z);
-      circleMesh.lookAt( camera.position );
-      room.links[i].circleMesh = circleMesh;
-      // scene.add( room.links[i].circleMesh );
+        var cartesianPosition = sphericalToCartesian(distRadius, theta,phi);
+
+        room.featureBubbles[i].backgroundSprite.position.set(cartesianPosition.x,cartesianPosition.y,cartesianPosition.z);
+        scene.add(room.featureBubbles[i].backgroundSprite);
+      }
     }
 
     function generateLinkSprite()
@@ -227,6 +238,48 @@
       context.stroke();
 
       return canvas; 
+    }
+
+    function generateFeatureBubbleBackground(featureText)
+    {
+      var canvas = document.createElement( 'canvas' );
+      canvas.width = 200;
+      canvas.height = 200;
+
+      var context = canvas.getContext( '2d' );
+
+      var centerX = canvas.width / 2;
+      var centerY = canvas.height / 2;  
+
+      context.beginPath();
+      context.rect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = '#66CD00';
+      context.fill();
+      context.lineWidth = 10;
+      context.strokeStyle = '#000000'; 
+      context.stroke();
+      context.font = "Bold 35px Arial";
+      context.fillStyle = '#000000';
+      context.fillText(featureText, 0, centerY);
+
+
+//       var textCanvas = document.createElement('div');
+//       textCanvas.style.position = 'absolute';
+// //textCanvas.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
+//       textCanvas.style.width = 100;
+//       textCanvas.style.height = 100;
+//       textCanvas.style.backgroundColor = "blue";
+//       textCanvas.innerHTML = featureText;
+//       textCanvas.style.top = centerY + 'px';
+//       textCanvas.style.left = centerX + 'px';
+//       document.body.appendChild(textCanvas);
+
+      // context.moveTo(0, height - (height - 10));
+      // context.lineTo(0, height - 10);
+      // context.moveTo(0, height - 10);
+      // context.arcTo()
+
+      return canvas;
     }
 
     function sphericalToCartesian(radius, theta, phi)
