@@ -134,7 +134,7 @@
 
       var r9 = new Room(9, "images\\outsidehouse.JPG");
       r9.links.push(new RoomLink(5,109.65,175.75));
-      r9.featureBubbles.push(new FeatureBubble(1,85.41,174.68, 'Here Lies Shrek.'));
+      r9.featureBubbles.push(new FeatureBubble(1,85.41,174.68, 'Here Lies Shrek the conqueror of worlds, no one dares to face him because he is shrek'));
       rooms.push(r9); 
     }
 
@@ -204,11 +204,11 @@
           room.featureBubbles[i].backgroundSprite = new THREE.Sprite( material );
           /* Why scale the sprite link here when you can just increase the size of the canvas */
           console.log("scale x: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z: " + room.featureBubbles[i].backgroundSprite.scale.z);
-          room.featureBubbles[i].backgroundSprite.scale.set(50,20,0);
+          room.featureBubbles[i].backgroundSprite.scale.set(30,30,30);
            console.log("scale x after: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y after: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z after: " + room.featureBubbles[i].backgroundSprite.scale.z);
         }
 
-        var distRadius = 70;
+        var distRadius = 40;
         var theta = toRadians(room.featureBubbles[i].theta);
         var phi = toRadians(room.featureBubbles[i].phi);
 
@@ -246,41 +246,71 @@
     {
       var canvas = document.createElement( 'canvas' );
       canvas.width = 500;
-      canvas.height = 300;
+      canvas.height = 500;
 
       var context = canvas.getContext( '2d' );
 
-      var centerX = canvas.width / 2;
-      var centerY = canvas.height / 2;
+      var textSize = 16;
+      var font = textSize + "px Arial";
+      context.fillStyle = '#000000';
+      context.font = font;
+      // drawTextBG(context, "loco", font, 30,30 )
 
-      roundRect(context, 0,0,canvas.width, canvas.height, 90.0);  
-      // context.rect(0, 0, canvas.width, canvas.height);
+      var numberOfLines = NumberOfLines(context, featureText, 100, 100, canvas.width - 50, textSize + 5);
+      var textWidth = context.measureText(featureText).width; 
+      if (numberOfLines > 1) 
+      {
+        textWidth = canvas.width - 50;
+      };
+
+      textHeight = (textSize + 5) * numberOfLines;
+
+      // console.log("number of lines: " + numberOfLines);    
+      console.log("text width: " + textWidth);
+
+      // function roundRect(ctx, x, y, w, h, r)    
+
+      roundRect(context,75, 75, textWidth, textHeight, 45.0);
+      // context.fillStyle = '#f50';  
+      // context.fillRect(100, 100, textWidth, textHeight);
       // context.stroke();
       context.beginPath();
-      context.font = "Bold 35px Arial";
+      context.font = font;
       context.fillStyle = '#000000';
-      wrapText(context, featureText, 100, 100, canvas.width, canvas.height);
-      // context.fillText(featureText, 0, centerY);
-
-
-//       var textCanvas = document.createElement('div');
-//       textCanvas.style.position = 'absolute';
-// //textCanvas.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
-//       textCanvas.style.width = 100;
-//       textCanvas.style.height = 100;
-//       textCanvas.style.backgroundColor = "blue";
-//       textCanvas.innerHTML = featureText;
-//       textCanvas.style.top = centerY + 'px';
-//       textCanvas.style.left = centerX + 'px';
-//       document.body.appendChild(textCanvas);
-
-      // context.moveTo(0, height - (height - 10));
-      // context.lineTo(0, height - 10);
-      // context.moveTo(0, height - 10);
-      // context.arcTo()
+      wrapText(context, featureText, 100, 100, canvas.width - 50, textSize + 5);
 
       return canvas;
     }
+
+    function drawTextBG(ctx, txt, font, x, y) {
+
+    /// lets save current state as we make a lot of changes        
+    ctx.save();
+
+    /// set font
+    ctx.font = font;
+
+    /// draw text from top - makes life easier at the moment
+    ctx.textBaseline = 'top';
+
+    /// color for background
+    ctx.fillStyle = '#f50';
+
+    /// get width of text
+    var width = ctx.measureText(txt).width;
+
+    /// draw background rect assuming height of font
+    ctx.fillRect(x, y, width, parseInt(font, 10));
+
+    /// text color
+    ctx.fillStyle = '#000';
+
+    /// draw text on top
+    ctx.fillText(txt, x, y);
+
+    /// restore original state
+    ctx.restore();
+}
 
     function sphericalToCartesian(radius, theta, phi)
     {
@@ -571,10 +601,9 @@
       ctx.lineTo(x + r, y + h);
       ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r);
       ctx.quadraticCurveTo(x, y, x + r, y);
-      // ctx.fillStyle = '#66CD00';
       ctx.fillStyle = "rgba(127, 255, 0, 0.5)";
       ctx.fill();
-      ctx.lineWidth = 10;
+      ctx.lineWidth = 2.5;
       ctx.strokeStyle = '#000000'; 
       ctx.closePath(); ctx.fill(); ctx.stroke(); 
     }
@@ -584,20 +613,52 @@
         var words = text.split(' ');
         var line = '';
 
-        for(var n = 0; n < words.length; n++) {
+        for(var n = 0; n < words.length; n++) 
+        {
           var testLine = line + words[n] + ' ';
           var metrics = context.measureText(testLine);
           var testWidth = metrics.width;
-          if (testWidth > maxWidth && n > 0) {
+
+          if (testWidth > maxWidth && n > 0) 
+          {
             context.fillText(line, x, y);
             line = words[n] + ' ';
             y += lineHeight;
           }
-          else {
+          else 
+          {
             line = testLine;
           }
         }
         context.fillText(line, x, y);
+    }
+
+
+    function NumberOfLines(context, text, x, y, maxWidth, lineHeight) 
+    {
+        var words = text.split(' ');
+        var line = '';
+        var numberoflines = 1;
+
+        for(var n = 0; n < words.length; n++) 
+        {
+          var testLine = line + words[n] + ' ';
+          var metrics = context.measureText(testLine);
+          var testWidth = metrics.width;
+
+          if (testWidth > maxWidth && n > 0) 
+          {
+            line = words[n] + ' ';
+            y += lineHeight;
+            numberoflines = numberoflines + 1;
+          }
+          else 
+          {
+            line = testLine;
+          }
+        }
+
+        return numberoflines;
     }
   </script>
   </body>
