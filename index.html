@@ -245,8 +245,8 @@
     function generateFeatureBubbleBackground(featureText)
     {
       var canvas = document.createElement( 'canvas' );
-      canvas.width = 500;
-      canvas.height = 500;
+      canvas.width = 400;
+      canvas.height = 400;
 
       var context = canvas.getContext( '2d' );
 
@@ -260,7 +260,7 @@
       var textWidth = context.measureText(featureText).width; 
       if (numberOfLines > 1) 
       {
-        textWidth = canvas.width - 50;
+        textWidth = canvas.width;
       };
 
       textHeight = (textSize + 5) * numberOfLines;
@@ -270,14 +270,14 @@
 
       // function roundRect(ctx, x, y, w, h, r)    
 
-      roundRect(context,75, 75, textWidth, textHeight, 45.0);
+      roundRect(context,80, 80, textWidth + 50, textHeight + 20, 45.0);
       // context.fillStyle = '#f50';  
       // context.fillRect(100, 100, textWidth, textHeight);
       // context.stroke();
       context.beginPath();
       context.font = font;
       context.fillStyle = '#000000';
-      wrapText(context, featureText, 100, 100, canvas.width - 50, textSize + 5);
+      wrapText(context, featureText, 100, 100, canvas.width, textSize + 5);
 
       return canvas;
     }
