@@ -38,6 +38,7 @@
     var currentRoom = null;
     var magnificationFactor = 1.4;
     var rooms = [];
+    var texloader;
 
     var clock = new THREE.Clock();
 
@@ -134,17 +135,19 @@
 
       var r9 = new Room(9, "images\\outsidehouse.JPG");
       r9.links.push(new RoomLink(5,109.65,175.75));
-      r9.featureBubbles.push(new FeatureBubble(1,85.41,174.68, 'Here Lies Shrek the conqueror of worlds, no one dares to face him because he is shrek'));
+      // r9.featureBubbles.push(new FeatureBubble(1,85.41,174.68, 'Here Lies Shrek the conqueror of worlds, no one dares to face him because he is shrek'));
       rooms.push(r9); 
     }
 
     function setScene(room){
       currentRoom = room;
 
+      var tex = texloader.load(room.image);
+
       sphere = new THREE.Mesh(
         new THREE.SphereGeometry(100, 60, 60),
         new THREE.MeshBasicMaterial({
-        map: THREE.ImageUtils.loadTexture(room.image)
+        map: tex
       })
       );
       /* Why are we applying a linear filter? do texels not map directly to pixels? */
@@ -154,7 +157,7 @@
       scene.add(sphere);
 
       addLinksToScene(room);
-      addFeatureBubblesToScene(room);
+      // addFeatureBubblesToScene(room);
     }
 
     function addLinksToScene(room)
@@ -222,8 +225,8 @@
     function generateLinkSprite()
     {
       var canvas = document.createElement( 'canvas' );
-      canvas.width = 200;
-      canvas.height = 200;
+      canvas.width = 256;
+      canvas.height = 256;
 
       var context = canvas.getContext( '2d' );
 
@@ -340,7 +343,8 @@
 
     function init() {
 
-      renderer = new THREE.WebGLRenderer();
+      renderer = new THREE.WebGLRenderer({ antialiasing: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
 
       window.onkeydown = keyDownEvent;
 
@@ -352,6 +356,8 @@
       effect.separation = 0;
 
       scene = new THREE.Scene();
+
+      texloader = new THREE.TextureLoader();
 
       camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
       camera.position.set(0, 0, 0);
@@ -383,6 +389,7 @@
 
         window.removeEventListener('deviceorientation', setOrientationControls, true);
       }
+
       window.addEventListener('deviceorientation', setOrientationControls, true);
 
       window.addEventListener('resize', resize, false);
@@ -534,7 +541,8 @@
       }
 
       sphere.material.map.dispose();
-      sphere.material.map = THREE.ImageUtils.loadTexture(newRoom.image);
+      var tex = texloader.load(newRoom.image);
+      sphere.material.map = tex;
       sphere.material.map.minFilter = THREE.LinearFilter;
 
       addLinksToScene(newRoom);
