@@ -354,10 +354,6 @@
       container = document.getElementById('example');
       container.appendChild(element);
 
-      effect = new THREE.StereoEffect(renderer);
-      effect.setSize( window.innerWidth, window.innerHeight );
-      effect.separation = -9;
-
       scene = new THREE.Scene();
 
       texloader = new THREE.TextureLoader();
@@ -366,6 +362,10 @@
       camera.position.set(0, 0, 0);
       camera.fov = 90;
       scene.add(camera);
+
+      effect = new THREE.StereoEffect(renderer);
+      effect.separation = -3;
+      resize();
 
       controls = new THREE.OrbitControls(camera, element);
       // controls.rotateUp(Math.PI / 4);
@@ -412,7 +412,7 @@
 
       renderer.setSize(width, height);
       // effect.setSize(width, height);
-      effect.setSize( window.innerWidth, window.innerHeight );
+      effect.setSize( width, height );
     }
 
     function update(dt) {
@@ -516,7 +516,7 @@
         container.mozRequestFullScreen();
       } else if (container.webkitRequestFullscreen) {
         container.webkitRequestFullscreen();
-      }
+      } 
     }
 
     function clickEvent()
