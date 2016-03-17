@@ -179,7 +179,7 @@
 
         }
 
-        var distRadius = 90;
+        var distRadius = 95;
         var theta = toRadians(room.links[i].theta);
         var phi = toRadians(room.links[i].phi);
 
@@ -197,28 +197,28 @@
       {
         if(room.featureBubbles[i].backgroundSprite == null)
         {
-          var texture = new THREE.Texture( generateFeatureBubbleBackground(room.featureBubbles[i].informationText) );
-          texture.needsUpdate = true; // important!
-          /* Why is this important*/
+          // var texture = new THREE.Texture( generateFeatureBubbleBackground(room.featureBubbles[i].informationText) );
+          // texture.needsUpdate = true; // important!
+          // /* Why is this important*/
 
-          /* Can you apply a texture as a texure map itself?*/
-          var material = new THREE.SpriteMaterial( { map: texture } );
+          // /* Can you apply a texture as a texure map itself?*/
+          // var material = new THREE.SpriteMaterial( { map: texture } );
 
-          room.featureBubbles[i].backgroundSprite = new THREE.Sprite( material );
+          room.featureBubbles[i].backgroundSprite = generateFeatureBubbleBackground(room.featureBubbles[i].informationText);
           /* Why scale the sprite link here when you can just increase the size of the canvas */
-          console.log("scale x: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z: " + room.featureBubbles[i].backgroundSprite.scale.z);
+          // console.log("scale x: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z: " + room.featureBubbles[i].backgroundSprite.scale.z);
           room.featureBubbles[i].backgroundSprite.scale.set(30,30,30);
-           console.log("scale x after: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y after: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z after: " + room.featureBubbles[i].backgroundSprite.scale.z);
+          //  console.log("scale x after: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y after: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z after: " + room.featureBubbles[i].backgroundSprite.scale.z);
         }
 
-        var distRadius = 40;
+        var distRadius = 90;
         var theta = toRadians(room.featureBubbles[i].theta);
         var phi = toRadians(room.featureBubbles[i].phi);
 
         var cartesianPosition = sphericalToCartesian(distRadius, theta,phi);
 
         room.featureBubbles[i].backgroundSprite.position.set(cartesianPosition.x,cartesianPosition.y,cartesianPosition.z);
-        scene.add(room.featureBubbles[i].backgroundSprite);
+        scene.add(room.featureBubbles[i].backgroundSprite); 
       }
     }
 
@@ -247,42 +247,44 @@
 
     function generateFeatureBubbleBackground(featureText)
     {
-      var canvas = document.createElement( 'canvas' );
-      canvas.width = 512;
-      canvas.height = 512;
+        var fontface = "Arial";
+        var fontsize = 18;
+        var borderThickness = 4;
+        var borderColor = { r:0, g:0, b:0, a:1.0 };
+        var backgroundColor = { r:255, g:255, b:255, a:0.8 };
+        var textColor = { r:0, g:0, b:0, a:1.0 };
 
-      var context = canvas.getContext( '2d' );
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        context.font = "Bold " + fontsize + "px " + fontface;
+        var maxWidth = 256;
 
-      var textSize = 16;
-      var font = textSize + "px Arial";
-      context.fillStyle = '#000000';
-      context.font = font;
-      // drawTextBG(context, "loco", font, 30,30 )
+        var metrics = context.measureText( featureText );
+        var textWidth = metrics.width;
 
-      var numberOfLines = NumberOfLines(context, featureText, 100, 100, canvas.width - 50, textSize + 5);
-      var textWidth = context.measureText(featureText).width; 
+      var numberOfLines = NumberOfLines(context, featureText, (canvas.width - maxWidth) / 2, 60, maxWidth, fontsize + 10);
       if (numberOfLines > 1) 
       {
-        textWidth = canvas.width;
+        textWidth = maxWidth;
       };
 
-      textHeight = (textSize + 5) * numberOfLines;
+        context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
+        context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
 
-      // console.log("number of lines: " + numberOfLines);    
-      console.log("text width: " + textWidth);
+        context.lineWidth = borderThickness;
+        roundRect(context, borderThickness/2, borderThickness/2, (textWidth + borderThickness) * 1.1, fontsize * numberOfLines * 1.6 + borderThickness, 8);
 
-      // function roundRect(ctx, x, y, w, h, r)    
+        context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", 1.0)";
+        wrapText(context, featureText, borderThickness + 5, (fontsize) + borderThickness, maxWidth, fontsize + 10);
+        // context.fillText( featureText, borderThickness, (fontsize) + borderThickness);
 
-      roundRect(context,80, 80, textWidth + 50, textHeight + 20, 45.0);
-      // context.fillStyle = '#f50';  
-      // context.fillRect(100, 100, textWidth, textHeight);
-      // context.stroke();
-      context.beginPath();
-      context.font = font;
-      context.fillStyle = '#000000';
-      wrapText(context, featureText, 100, 100, canvas.width, textSize + 5);
+        var texture = new THREE.Texture(canvas) 
+        texture.needsUpdate = true;
 
-      return canvas;
+        var spriteMaterial = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: false } );
+        var sprite = new THREE.Sprite( spriteMaterial );
+        sprite.scale.set(0.5 * fontsize, 0.25 * fontsize, 0.75 * fontsize);
+        return sprite;  
     }
 
     function drawTextBG(ctx, txt, font, x, y) {
@@ -612,10 +614,10 @@
       ctx.lineTo(x + r, y + h);
       ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r);
       ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.fillStyle = "rgba(127, 255, 0, 0.5)";
-      ctx.fill();
-      ctx.lineWidth = 2.5;
-      ctx.strokeStyle = '#000000'; 
+      // ctx.fillStyle = "rgba(127, 255, 0, 0.5)";
+      // ctx.fill();
+      // ctx.lineWidth = 2.5;
+      // ctx.strokeStyle = '#000000'; 
       ctx.closePath(); ctx.fill(); ctx.stroke(); 
     }
 
