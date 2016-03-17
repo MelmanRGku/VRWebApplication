@@ -83,7 +83,7 @@
       // rooms.push(r3);
 
       /********* HOUSE *********/
-      var r0 = new Room(0, "images\\foyer.JPG");
+      var r0 = new Room(0, "images/foyer.JPG");
       r0.links.push(new RoomLink(1,165.65,-141.73));
       r0.links.push(new RoomLink(7,28.24,-170.39));
       r0.links.push(new RoomLink(8,85.04,138.92));
@@ -91,51 +91,51 @@
 
       rooms.push(r0);
 
-      var r1 = new Room(1, "images\\diningarea.JPG");
+      var r1 = new Room(1, "images/diningarea.JPG");
       r1.links.push(new RoomLink(0,16.72,-35.95));
       r1.links.push(new RoomLink(2,73.83,179.81));
       r1.links.push(new RoomLink(7,15.78,-172.19));
       rooms.push(r1);
 
-      var r2 = new Room(2, "images\\kitchen.JPG");
+      var r2 = new Room(2, "images/kitchen.JPG");
       r2.links.push(new RoomLink(1,105.81,-6.07));
       r2.links.push(new RoomLink(4,81.215,-178.21));
       r2.links.push(new RoomLink(3,17.33,-37.18));
       rooms.push(r2);
 
-      var r3 = new Room(3, "images\\livingroom.JPG");
+      var r3 = new Room(3, "images/livingroom.JPG");
       r3.links.push(new RoomLink(2,163.71,-177.65));
       r3.links.push(new RoomLink(7,90.89,-8.67));
       r3.links.push(new RoomLink(4,90.57,-178.83));
       rooms.push(r3);
 
-      var r4 = new Room(4, "images\\backyard.JPG");
+      var r4 = new Room(4, "images/backyard.JPG");
       r4.links.push(new RoomLink(2,95.32,4.83));
       r4.links.push(new RoomLink(3,75.79, 4.76));
       rooms.push(r4);
 
-      var r5 = new Room(5, "images\\frontdoor.JPG");
+      var r5 = new Room(5, "images/frontdoor.JPG");
       r5.links.push(new RoomLink(0,85.41,174.68));
       r5.links.push(new RoomLink(9,72.07,-1.74));
       rooms.push(r5);
 
-      var r6 = new Room(6, "images\\bathroom.JPG");
+      var r6 = new Room(6, "images/bathroom.JPG");
       r6.links.push(new RoomLink(7,174.51,-103.87));
       rooms.push(r6);
 
-      var r7 = new Room(7, "images\\hallway.JPG");
+      var r7 = new Room(7, "images/hallway.JPG");
       r7.links.push(new RoomLink(6,3.22,-81.46));
       r7.links.push(new RoomLink(0,151.39,-7.97));
       r7.links.push(new RoomLink(3,90.71,-175.89));
       rooms.push(r7);
 
-      var r8 = new Room(8, "images\\secondfloor.JPG");
+      var r8 = new Room(8, "images/secondfloor.JPG");
       r8.links.push(new RoomLink(0,102.08,-37.81));
       rooms.push(r8); 
 
-      var r9 = new Room(9, "images\\outsidehouse.JPG");
+      var r9 = new Room(9, "images/outsidehouse.JPG");
       r9.links.push(new RoomLink(5,109.65,175.75));
-      // r9.featureBubbles.push(new FeatureBubble(1,85.41,174.68, 'Here Lies Shrek the conqueror of worlds, no one dares to face him because he is shrek'));
+      r9.featureBubbles.push(new FeatureBubble(1,85.41,174.68, 'Here Lies Shrek the conqueror of worlds, no one dares to face him because he is shrek'));
       rooms.push(r9); 
     }
 
@@ -157,7 +157,7 @@
       scene.add(sphere);
 
       addLinksToScene(room);
-      // addFeatureBubblesToScene(room);
+      addFeatureBubblesToScene(room);
     }
 
     function addLinksToScene(room)
@@ -248,8 +248,8 @@
     function generateFeatureBubbleBackground(featureText)
     {
       var canvas = document.createElement( 'canvas' );
-      canvas.width = 400;
-      canvas.height = 400;
+      canvas.width = 512;
+      canvas.height = 512;
 
       var context = canvas.getContext( '2d' );
 
@@ -353,7 +353,8 @@
       container.appendChild(element);
 
       effect = new THREE.StereoEffect(renderer);
-      effect.separation = 0;
+      effect.setSize( window.innerWidth, window.innerHeight );
+      effect.separation = -9;
 
       scene = new THREE.Scene();
 
@@ -408,7 +409,8 @@
       camera.updateProjectionMatrix();
 
       renderer.setSize(width, height);
-      effect.setSize(width, height);
+      // effect.setSize(width, height);
+      effect.setSize( window.innerWidth, window.innerHeight );
     }
 
     function update(dt) {
@@ -527,6 +529,7 @@
         switchRooms(rooms[selectedLink.toId]);
         selectedLink = null;
       }
+        // effect.separation = effect.separation + 1;
     }
 
     function switchRooms(newRoom)
