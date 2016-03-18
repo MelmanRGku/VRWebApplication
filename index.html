@@ -198,18 +198,26 @@
       {
         if(room.featureBubbles[i].backgroundSprite == null)
         {
-          // var texture = new THREE.Texture( generateFeatureBubbleBackground(room.featureBubbles[i].informationText) );
-          // texture.needsUpdate = true; // important!
-          // /* Why is this important*/
-
-          // /* Can you apply a texture as a texure map itself?*/
-          // var material = new THREE.SpriteMaterial( { map: texture } );
 
           room.featureBubbles[i].backgroundSprite = generateFeatureBubbleBackground(room.featureBubbles[i].informationText);
           /* Why scale the sprite link here when you can just increase the size of the canvas */
           // console.log("scale x: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z: " + room.featureBubbles[i].backgroundSprite.scale.z);
           room.featureBubbles[i].backgroundSprite.scale.set(30,30,30);
           //  console.log("scale x after: " + room.featureBubbles[i].backgroundSprite.scale.x + " scale y after: " + room.featureBubbles[i].backgroundSprite.scale.y + " scale z after: " + room.featureBubbles[i].backgroundSprite.scale.z);
+        }
+
+        if(room.featureBubbles[i].indicatorSprite == null)
+        {
+          var texture = new THREE.Texture( generateFeatureBubblePoint() );
+          texture.needsUpdate = true; // important!
+          /* Why is this important*/
+
+          /* Can you apply a texture as a texure map itself?*/
+          var material = new THREE.SpriteMaterial( { map: texture } );
+
+          room.featureBubbles[i].indicatorSprite = new THREE.Sprite( material );
+          /* Why scale the sprite link here when you can just increase the size of the canvas */
+          room.featureBubbles[i].indicatorSprite.scale.set(10,10,10);
         }
 
         var distRadius = 90;
@@ -219,7 +227,8 @@
         var cartesianPosition = sphericalToCartesian(distRadius, theta,phi);
 
         room.featureBubbles[i].backgroundSprite.position.set(cartesianPosition.x,cartesianPosition.y,cartesianPosition.z);
-        scene.add(room.featureBubbles[i].backgroundSprite); 
+        room.featureBubbles[i].indicatorSprite.position.set(cartesianPosition.x,cartesianPosition.y,cartesianPosition.z);
+        scene.add(room.featureBubbles[i].indicatorSprite); 
       }
     }
 
@@ -234,13 +243,13 @@
       var height   = 100;
       var arrowW   = 0.35 * width;
       var arrowH   = 0.75 * height;
-      var p1       = {x: 0,              y: (height-arrowH)/2};
+      var p1       = {x: width/3,              y: (height-arrowH)/2};
       var p2       = {x: (width-arrowW), y: (height-arrowH)/2};
       var p3       = {x: (width-arrowW), y: 0};
       var p4       = {x: width,          y: height/2};
       var p5       = {x: (width-arrowW), y: height};
       var p6       = {x: (width-arrowW), y: height-((height-arrowH)/2)};
-      var p7       = {x: 0,              y: height-((height-arrowH)/2)};
+      var p7       = {x: width/3,              y: height-((height-arrowH)/2)};
 
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.fillStyle = '#F0C400';
@@ -262,21 +271,28 @@
 
       context.rotate(Math.PI/2);
 
+      return canvas; 
+    }
 
-      // var centerX = canvas.width / 2;
-      // var centerY = canvas.height / 2;
-      // // function canvas_arrow(context, fromx, fromy, tox, toy);
+    function generateFeatureBubblePoint()
+    {
+      var canvas = document.createElement( 'canvas' );
+      canvas.width = 256;
+      canvas.height = 256;
 
-      // // var radius = 50;
+      var context = canvas.getContext( '2d' );
 
-      // context.beginPath();
-      // canvas_arrow(context, centerX, 0, centerX, canvas.height);
-      // // context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-      // context.fillStyle = '#F0C400';
-      // context.fill();
-      // context.lineWidth = 1;
-      // context.strokeStyle = '#000000'; 
-      // context.stroke();
+      var centerX = canvas.width / 2;
+      var centerY = canvas.height / 2;
+      var radius = 50;
+
+      context.beginPath();
+      context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+      context.fillStyle = '#FFFFFF';
+      context.fill();
+      context.lineWidth = 10;
+      context.strokeStyle = '#000000'; 
+      context.stroke();
 
       return canvas; 
     }
@@ -569,7 +585,21 @@
         scene.remove(currentRoom.links[i].linkSprite);
         currentRoom.links[i].linkSprite.geometry.dispose();  
         currentRoom.links[i].linkSprite.material.map.dispose();
-        currentRoom.links[i].linkSprite.material.dispose();  
+        currentRoom.links[i].linkSprite.material.dispose(); 
+      }
+
+      // Remove old feature bubbles
+      for(i = 0; i < currentRoom.featureBubbles.length; i++)
+      {
+        scene.remove(currentRoom.featureBubbles[i].backgroundSprite);
+        currentRoom.featureBubbles[i].backgroundSprite.geometry.dispose();
+        currentRoom.featureBubbles[i].backgroundSprite.material.map.dispose();
+        currentRoom.featureBubbles[i].backgroundSprite.material.dispose();
+
+        scene.remove(currentRoom.featureBubbles[i].indicatorSprite);
+        currentRoom.featureBubbles[i].indicatorSprite.geometry.dispose();
+        currentRoom.featureBubbles[i].indicatorSprite.material.map.dispose();
+        currentRoom.featureBubbles[i].indicatorSprite.material.dispose();
       }
 
       sphere.material.map.dispose();
@@ -577,6 +607,7 @@
       sphere.material.map = tex;
       sphere.material.map.minFilter = THREE.LinearFilter;
 
+      addFeatureBubblesToScene(newRoom);
       addLinksToScene(newRoom);
 
       currentRoom = newRoom;
