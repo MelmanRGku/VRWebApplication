@@ -340,6 +340,10 @@
         {
           camera.translateZ( -5 );
         }
+        else if(key == 83)
+        {
+          fullscreen();
+        }
       }
     }
 
@@ -376,6 +380,8 @@
       );
       controls.noZoom = true;
       controls.noPan = true;
+
+      // element.addEventListener("click", function() {THREEx.FullScreen.request();}, false);
 
       element.addEventListener('click', clickEvent, false);
 
@@ -507,17 +513,19 @@
       }
     }
 
-    function fullscreen() {
-      if (container.requestFullscreen) {
-        container.requestFullscreen();
-      } else if (container.msRequestFullscreen) {
-        container.msRequestFullscreen();
-      } else if (container.mozRequestFullScreen) {
-        container.mozRequestFullScreen();
-      } else if (container.webkitRequestFullscreen) {
-        container.webkitRequestFullscreen();
-      } 
-    }
+    // THREEx.FullScreen.request   = function(element)
+    // {
+    //     element = element   || document.body;
+    //     if( this._hasWebkitFullScreen ){
+    //         element.webkitRequestFullScreen();
+    //         console.log("f");
+    //     }else if( this._hasMozFullScreen ){
+    //         element.mozRequestFullScreen();
+    //         console.log("g");
+    //     }else{
+    //         console.assert(false);
+    //     }
+    // }
 
     function clickEvent()
     {
@@ -531,7 +539,20 @@
         switchRooms(rooms[selectedLink.toId]);
         selectedLink = null;
       }
+      fullscreen();
         // effect.separation = effect.separation + 1;
+    }
+
+    function fullscreen() {
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+      } else if (container.mozRequestFullScreen) {
+        container.mozRequestFullScreen();
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      } 
     }
 
     function switchRooms(newRoom)
