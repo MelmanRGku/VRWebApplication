@@ -167,7 +167,7 @@
       {
         if(room.links[i].linkSprite == null)
         {
-          var texture = new THREE.Texture( generateLinkSprite() );
+          var texture = new THREE.Texture( generateLinkSprite(rooms[room.links[i].toId].name) );
           texture.needsUpdate = true; // important!
           /* Why is this important*/
 
@@ -232,24 +232,24 @@
       }
     }
 
-    function generateLinkSprite()
+    function generateLinkSprite(roomName)
     {
       var canvas = document.createElement( 'canvas' );
-      canvas.width = 400;
-      canvas.height = 400;
+      canvas.width = 512;
+      canvas.height = 512;
       var context = canvas.getContext( '2d' );
 
       var width    = 400;
       var height   = 100;
-      var arrowW   = 0.75 * height;
-      var arrowH   = 0.20 * width;
-      var p1       = {x: (width-arrowH)/2,              y: arrowH};
-      var p2       = {x: (width-arrowH)/2, y: (height-arrowW)*2};
-      var p3       = {x: width/3, y: (height - arrowW)*2};
+      var arrowW   = 0.20 * width;
+      var arrowH   = 0.75 * height;
+      var p1       = {x: (width-arrowW)/2,              y: arrowH};
+      var p2       = {x: (width-arrowW)/2, y: (height-arrowH)*2};
+      var p3       = {x: width/3, y: (height - arrowH)*2};
       var p4       = {x: width/2,          y: 0};
-      var p5       = {x: width * (2/3), y: (height-arrowW)*2};
-      var p6       = {x: width-((width-arrowH)/2), y: (height-arrowW)*2};
-      var p7       = {x: width-((width-arrowH)/2),              y: arrowH};
+      var p5       = {x: width * (2/3), y: (height-arrowH)*2};
+      var p6       = {x: width-((width-arrowW)/2), y: (height-arrowH)*2};
+      var p7       = {x: width-((width-arrowW)/2),              y: arrowH};
 
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.fillStyle = '#F0C400';
@@ -269,7 +269,30 @@
       context.strokeStyle = '#000000'; 
       context.stroke();
 
-      context.rotate(Math.PI/2);
+
+
+// function roundRect(ctx, x, y, w, h, r) { 
+
+        var fontface = "Arial";
+        var fontsize = 24;
+        var borderThickness = 4;
+        var borderColor = { r:0, g:0, b:0, a:1.0 };
+        var textColor = { r:0, g:0, b:0, a:1.0 };
+
+        context.font = "Bold " + fontsize + "px " + fontface;
+        var maxWidth = 256;
+
+        var metrics = context.measureText( roomName );
+        var textWidth = metrics.width;
+
+        context.fillStyle   = '#F0C400';
+        context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
+
+        context.lineWidth = borderThickness;
+        roundRect(context,  ((width/2) -(textWidth/2)) - borderThickness, arrowH + borderThickness, (textWidth + borderThickness) * 1.1, fontsize * 1.6 + borderThickness, 8);
+
+        context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", 1.0)";
+        wrapText(context, roomName, ((width/2) -(textWidth/2)) - borderThickness + 5, (fontsize) + arrowH + borderThickness, maxWidth, fontsize + 10);
 
       return canvas; 
     }
