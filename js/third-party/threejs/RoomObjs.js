@@ -1,11 +1,12 @@
 "use strict";
 
 class Room{
-	constructor(id, image)
+	constructor(id, image, name)
 	{
 		"use strict";
 		this.id = id;
 		this.image = image;
+		this.name = name;
 		this.links = new Array();
 		this.featureBubbles = new Array();
 	}

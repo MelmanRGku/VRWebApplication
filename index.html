@@ -84,7 +84,7 @@
       // rooms.push(r3);
 
       /********* HOUSE *********/
-      var r0 = new Room(0, "images/foyer.JPG");
+      var r0 = new Room(0, "images/foyer.JPG", "foyer");
       r0.links.push(new RoomLink(1,165.65,-141.73));
       r0.links.push(new RoomLink(7,28.24,-170.39));
       r0.links.push(new RoomLink(8,85.04,138.92));
@@ -92,49 +92,49 @@
 
       rooms.push(r0);
 
-      var r1 = new Room(1, "images/diningarea.JPG");
+      var r1 = new Room(1, "images/diningarea.JPG", "Dinning Area");
       r1.links.push(new RoomLink(0,16.72,-35.95));
       r1.links.push(new RoomLink(2,73.83,179.81));
       r1.links.push(new RoomLink(7,15.78,-172.19));
       rooms.push(r1);
 
-      var r2 = new Room(2, "images/kitchen.JPG");
+      var r2 = new Room(2, "images/kitchen.JPG", "Kitchen");
       r2.links.push(new RoomLink(1,105.81,-6.07));
       r2.links.push(new RoomLink(4,81.215,-178.21));
       r2.links.push(new RoomLink(3,17.33,-37.18));
       rooms.push(r2);
 
-      var r3 = new Room(3, "images/livingroom.JPG");
+      var r3 = new Room(3, "images/livingroom.JPG", "Living Room");
       r3.links.push(new RoomLink(2,163.71,-177.65));
       r3.links.push(new RoomLink(7,90.89,-8.67));
       r3.links.push(new RoomLink(4,90.57,-178.83));
       rooms.push(r3);
 
-      var r4 = new Room(4, "images/backyard.JPG");
+      var r4 = new Room(4, "images/backyard.JPG", "Backyard");
       r4.links.push(new RoomLink(2,95.32,4.83));
       r4.links.push(new RoomLink(3,75.79, 4.76));
       rooms.push(r4);
 
-      var r5 = new Room(5, "images/frontdoor.JPG");
+      var r5 = new Room(5, "images/frontdoor.JPG", "Frontdoor");
       r5.links.push(new RoomLink(0,85.41,174.68));
       r5.links.push(new RoomLink(9,72.07,-1.74));
       rooms.push(r5);
 
-      var r6 = new Room(6, "images/bathroom.JPG");
+      var r6 = new Room(6, "images/bathroom.JPG", "Bathroom");
       r6.links.push(new RoomLink(7,174.51,-103.87));
       rooms.push(r6);
 
-      var r7 = new Room(7, "images/hallway.JPG");
+      var r7 = new Room(7, "images/hallway.JPG", "Hallway");
       r7.links.push(new RoomLink(6,3.22,-81.46));
       r7.links.push(new RoomLink(0,151.39,-7.97));
       r7.links.push(new RoomLink(3,90.71,-175.89));
       rooms.push(r7);
 
-      var r8 = new Room(8, "images/secondfloor.JPG");
+      var r8 = new Room(8, "images/secondfloor.JPG", "Second Floor");
       r8.links.push(new RoomLink(0,102.08,-37.81));
       rooms.push(r8); 
 
-      var r9 = new Room(9, "images/outsidehouse.JPG");
+      var r9 = new Room(9, "images/outsidehouse.JPG", "Outside");
       r9.links.push(new RoomLink(5,109.65,175.75));
       r9.featureBubbles.push(new FeatureBubble(1,85.41,174.68, 'Here Lies Shrek the conqueror of worlds, no one dares to face him because he is shrek'));
       rooms.push(r9); 
@@ -172,8 +172,7 @@
           /* Why is this important*/
 
           /* Can you apply a texture as a texure map itself?*/
-          var material = new THREE.SpriteMaterial( { map: texture, 
-          rotation: Math.PI / 2} );
+          var material = new THREE.SpriteMaterial( { map: texture} );
 
           room.links[i].linkSprite = new THREE.Sprite( material );
           /* Why scale the sprite link here when you can just increase the size of the canvas */
@@ -242,15 +241,15 @@
 
       var width    = 400;
       var height   = 100;
-      var arrowW   = 0.35 * width;
-      var arrowH   = 0.75 * height;
-      var p1       = {x: width/3,              y: (height-arrowH)/2};
-      var p2       = {x: (width-arrowW), y: (height-arrowH)/2};
-      var p3       = {x: (width-arrowW), y: 0};
-      var p4       = {x: width,          y: height/2};
-      var p5       = {x: (width-arrowW), y: height};
-      var p6       = {x: (width-arrowW), y: height-((height-arrowH)/2)};
-      var p7       = {x: width/3,              y: height-((height-arrowH)/2)};
+      var arrowW   = 0.75 * height;
+      var arrowH   = 0.20 * width;
+      var p1       = {x: (width-arrowH)/2,              y: arrowH};
+      var p2       = {x: (width-arrowH)/2, y: (height-arrowW)*2};
+      var p3       = {x: width/3, y: (height - arrowW)*2};
+      var p4       = {x: width/2,          y: 0};
+      var p5       = {x: width * (2/3), y: (height-arrowW)*2};
+      var p6       = {x: width-((width-arrowH)/2), y: (height-arrowW)*2};
+      var p7       = {x: width-((width-arrowH)/2),              y: arrowH};
 
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.fillStyle = '#F0C400';
@@ -593,20 +592,6 @@
       }
     }
 
-    // THREEx.FullScreen.request   = function(element)
-    // {
-    //     element = element   || document.body;
-    //     if( this._hasWebkitFullScreen ){
-    //         element.webkitRequestFullScreen();
-    //         console.log("f");
-    //     }else if( this._hasMozFullScreen ){
-    //         element.mozRequestFullScreen();
-    //         console.log("g");
-    //     }else{
-    //         console.assert(false);
-    //     }
-    // }
-
     function clickEvent()
     {
 
@@ -629,7 +614,6 @@
       {
         fullscreen();
       }
-        // effect.separation = effect.separation + 1;
     }
 
     function openFeatureBubble(featurebubble)
