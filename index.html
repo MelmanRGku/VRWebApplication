@@ -35,6 +35,7 @@
     var element, container;
     var sphere;
     var selectedLink = null;
+    var selectedFeatureBubble = null;
     var currentRoom = null;
     var magnificationFactor = 1.4;
     var rooms = [];
@@ -460,6 +461,7 @@
       requestAnimationFrame(animate);
 
       highlightLinks();
+      highlightIndicators();
 
       update(clock.getDelta());
       render(clock.getDelta());
@@ -505,6 +507,46 @@
 
     }
 
+    function highlightIndicators()
+    {
+      var closestLink = null;
+      var closestLinkDotP = 0;
+
+      var cameraLookatVec = new THREE.Vector3( 0, 0, -1 );
+      cameraLookatVec.applyQuaternion( camera.quaternion );
+      cameraLookatVec.normalize();
+
+      if(currentRoom == null)
+        return;
+
+      for(i = 0; i  < currentRoom.featureBubbles.length; i++)
+      {
+        var circlePos = currentRoom.featureBubbles[i].indicatorSprite.position.clone();
+        circlePos.normalize();
+
+        var dotP = cameraLookatVec.dot(circlePos);
+
+        if(dotP > closestLinkDotP)
+        {
+          closestLinkDotP = dotP;
+          closestLink = currentRoom.featureBubbles[i];
+        }
+      }
+
+      if(closestLinkDotP < 0.95)
+      {
+        dehighlightIndicator(selectedFeatureBubble);
+        selectedFeatureBubble = null;
+      }
+      else if(closestLink != selectedFeatureBubble)
+      {
+        dehighlightIndicator(selectedFeatureBubble);
+        selectedFeatureBubble = closestLink;
+        highlightIndicator(selectedFeatureBubble);
+      }
+
+    }
+
     function highlightLinkSprite(link)
     {
       if(link != null){
@@ -516,6 +558,22 @@
     {
       if(link != null){
         link.linkSprite.scale.set(10,10,10);
+      }
+    }
+
+    function highlightIndicator(featureBubble)
+    {
+      if(featureBubble != null){
+        featureBubble.indicatorSprite.scale.set(20,20,20);
+        featureBubble.backgroundSprite.scale.set(20,20,20);
+      }
+    }
+
+    function dehighlightIndicator(featurebubble)
+    {
+      if(featurebubble != null){
+        featurebubble.indicatorSprite.scale.set(10,10,10);
+        featurebubble.backgroundSprite.scale.set(10,10,10);
       }
     }
 
@@ -561,8 +619,33 @@
         switchRooms(rooms[selectedLink.toId]);
         selectedLink = null;
       }
-      fullscreen();
+      else if(selectedFeatureBubble != null)
+      {
+        dehighlightIndicator(selectedFeatureBubble);
+        openFeatureBubble(selectedFeatureBubble);
+        selectedFeatureBubble = null;
+      }
+      else
+      {
+        fullscreen();
+      }
         // effect.separation = effect.separation + 1;
+    }
+
+    function openFeatureBubble(featurebubble)
+    {
+      if(featurebubble.isOpen)
+      {
+        scene.remove(featurebubble.indicatorSprite);
+        scene.add(featurebubble.backgroundSprite); 
+        featurebubble.isOpen = false;
+      }
+      else
+      {
+        scene.remove(featurebubble.backgroundSprite);
+        scene.add(featurebubble.indicatorSprite); 
+        featurebubble.isOpen = true;
+      }
     }
 
     function fullscreen() {

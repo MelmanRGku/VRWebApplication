@@ -32,5 +32,6 @@ class FeatureBubble
 		this.informationText = informationText;
 		this.backgroundSprite = null;
 		this.indicatorSprite = null;
+		this.isOpen = false;
 	}
 }
