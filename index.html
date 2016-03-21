@@ -176,7 +176,7 @@
 
           room.links[i].linkSprite = new THREE.Sprite( material );
           /* Why scale the sprite link here when you can just increase the size of the canvas */
-          room.links[i].linkSprite.scale.set(10,10,10);
+          room.links[i].linkSprite.scale.set(20,20,20);
 
         }
 
@@ -217,7 +217,7 @@
 
           room.featureBubbles[i].indicatorSprite = new THREE.Sprite( material );
           /* Why scale the sprite link here when you can just increase the size of the canvas */
-          room.featureBubbles[i].indicatorSprite.scale.set(10,10,10);
+          room.featureBubbles[i].indicatorSprite.scale.set(5,5,5);
         }
 
         var distRadius = 90;
@@ -269,15 +269,12 @@
       context.strokeStyle = '#000000'; 
       context.stroke();
 
-
-
-// function roundRect(ctx, x, y, w, h, r) { 
-
         var fontface = "Arial";
-        var fontsize = 24;
+        var fontsize = 36;
         var borderThickness = 4;
         var borderColor = { r:0, g:0, b:0, a:1.0 };
         var textColor = { r:0, g:0, b:0, a:1.0 };
+        var backgroundColor = { r:255, g:255, b:255, a:0.8 };
 
         context.font = "Bold " + fontsize + "px " + fontface;
         var maxWidth = 256;
@@ -285,7 +282,7 @@
         var metrics = context.measureText( roomName );
         var textWidth = metrics.width;
 
-        context.fillStyle   = '#F0C400';
+        context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
         context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
 
         context.lineWidth = borderThickness;
@@ -572,21 +569,21 @@
     function highlightLinkSprite(link)
     {
       if(link != null){
-        link.linkSprite.scale.set(20,20,20);
+        link.linkSprite.scale.set(30,30,30);
       }
     }
 
     function dehighlightLinkSprite(link)
     {
       if(link != null){
-        link.linkSprite.scale.set(10,10,10);
+        link.linkSprite.scale.set(20,20,20);
       }
     }
 
     function highlightIndicator(featureBubble)
     {
       if(featureBubble != null){
-        featureBubble.indicatorSprite.scale.set(20,20,20);
+        featureBubble.indicatorSprite.scale.set(10,10,10);
         featureBubble.backgroundSprite.scale.set(20,20,20);
       }
     }
@@ -594,7 +591,7 @@
     function dehighlightIndicator(featurebubble)
     {
       if(featurebubble != null){
-        featurebubble.indicatorSprite.scale.set(10,10,10);
+        featurebubble.indicatorSprite.scale.set(5,5,5);
         featurebubble.backgroundSprite.scale.set(10,10,10);
       }
     }
