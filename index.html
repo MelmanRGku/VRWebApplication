@@ -460,9 +460,8 @@
       controls.noZoom = true;
       controls.noPan = true;
 
-      // element.addEventListener("click", function() {THREEx.FullScreen.request();}, false);
-
       element.addEventListener('click', clickEvent, false);
+      element.addEventListener('touchdown', clickEvent, false);
 
       function setOrientationControls(e) {
         if (!e.alpha) {
