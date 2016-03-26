@@ -589,19 +589,22 @@
       }
     }
 
-    function highlightIndicator(featureBubble)
+    function highlightIndicator(featurebubble)
     {
-      if(featureBubble != null){
-        featureBubble.indicatorSprite.scale.set(20,20,20);
-        featureBubble.backgroundSprite.scale.set(20,20,20);
-      }
+      if(featurebubble != null)
+      {
+        console.log("here");
+        scene.remove(featurebubble.indicatorSprite);
+        scene.add(featurebubble.backgroundSprite); 
+      }        
     }
 
     function dehighlightIndicator(featurebubble)
     {
-      if(featurebubble != null){
-        featurebubble.indicatorSprite.scale.set(10,10,10);
-        featurebubble.backgroundSprite.scale.set(10,10,10);
+      if(featurebubble != null)
+      {
+        scene.remove(featurebubble.backgroundSprite);
+        scene.add(featurebubble.indicatorSprite);
       }
     }
 
@@ -632,12 +635,6 @@
         // setScene(rooms[selectedLink.toId]);
         switchRooms(rooms[selectedLink.toId]);
         selectedLink = null;
-      }
-      else if(selectedFeatureBubble != null)
-      {
-        dehighlightIndicator(selectedFeatureBubble);
-        openFeatureBubble(selectedFeatureBubble);
-        selectedFeatureBubble = null;
       }
       else
       {
