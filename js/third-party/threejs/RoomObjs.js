@@ -18,7 +18,6 @@ class RoomLink{
 		this.toId = id;
 		this.theta = theta;
 		this.phi = phi;
-		this.circleMesh = null;
 		this.linkSprite = null;
 	}
 }
