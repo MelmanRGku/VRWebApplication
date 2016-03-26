@@ -84,7 +84,7 @@
       // rooms.push(r3);
 
       /********* HOUSE *********/
-      var r0 = new Room(0, "images/foyer.JPG", "foyer");
+      var r0 = new Room(0, "images/foyer.JPG", "Foyer");
       r0.links.push(new RoomLink(1,165.65,-141.73));
       r0.links.push(new RoomLink(7,28.24,-170.39));
       r0.links.push(new RoomLink(8,85.04,138.92));
@@ -102,26 +102,35 @@
       r2.links.push(new RoomLink(1,105.81,-6.07));
       r2.links.push(new RoomLink(4,81.215,-178.21));
       r2.links.push(new RoomLink(3,17.33,-37.18));
+      r2.featureBubbles.push(new FeatureBubble(6,133.50,-87.64, 'Brand new marble counter top'));
+      r2.featureBubbles.push(new FeatureBubble(7,102.46,-175.37, 'Lots of natural light'));
       rooms.push(r2);
 
       var r3 = new Room(3, "images/livingroom.JPG", "Living Room");
       r3.links.push(new RoomLink(2,163.71,-177.65));
       r3.links.push(new RoomLink(7,90.89,-8.67));
       r3.links.push(new RoomLink(4,90.57,-178.83));
+      r3.featureBubbles.push(new FeatureBubble(4,45.53,-78.81, 'Newly installed hardwood floor'));
+      r3.featureBubbles.push(new FeatureBubble(5,24.35,-130.83, 'Real Fire Place'));
       rooms.push(r3);
 
       var r4 = new Room(4, "images/backyard.JPG", "Backyard");
       r4.links.push(new RoomLink(2,95.32,4.83));
       r4.links.push(new RoomLink(3,75.79, 4.76));
+      r4.featureBubbles.push(new FeatureBubble(9,154.27,-27.20, 'Spacious outside storage area'));
+      r4.featureBubbles.push(new FeatureBubble(10,86.87,-155.41, 'Spacious backyard'));
       rooms.push(r4);
 
       var r5 = new Room(5, "images/frontdoor.JPG", "Frontdoor");
       r5.links.push(new RoomLink(0,85.41,174.68));
       r5.links.push(new RoomLink(9,72.07,-1.74));
+      r5.featureBubbles.push(new FeatureBubble(11,168.10,90.03, 'Only one neighbor'));
       rooms.push(r5);
 
       var r6 = new Room(6, "images/bathroom.JPG", "Bathroom");
-      r6.links.push(new RoomLink(7,174.51,-103.87));
+      r6.links.push(new RoomLink(1,174.51,-103.87));
+      r6.featureBubbles.push(new FeatureBubble(1,104.14,-144.05, 'Brand new marble counter tops'));
+      r6.featureBubbles.push(new FeatureBubble(2,53.89,-129.28, 'Automatic toilet washer'));
       rooms.push(r6);
 
       var r7 = new Room(7, "images/hallway.JPG", "Hallway");
@@ -136,7 +145,7 @@
 
       var r9 = new Room(9, "images/outsidehouse.JPG", "Outside");
       r9.links.push(new RoomLink(5,109.65,175.75));
-      r9.featureBubbles.push(new FeatureBubble(1,85.41,174.68, 'Here Lies Shrek the conqueror of worlds, no one dares to face him because he is shrek'));
+      r9.featureBubbles.push(new FeatureBubble(3,67.09,172.82, 'Corner house with only one close neighbor'));
       rooms.push(r9); 
     }
 
@@ -217,7 +226,7 @@
 
           room.featureBubbles[i].indicatorSprite = new THREE.Sprite( material );
           /* Why scale the sprite link here when you can just increase the size of the canvas */
-          room.featureBubbles[i].indicatorSprite.scale.set(5,5,5);
+          room.featureBubbles[i].indicatorSprite.scale.set(10,10,10);
         }
 
         var distRadius = 90;
@@ -308,7 +317,7 @@
 
       context.beginPath();
       context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-      context.fillStyle = '#FFFFFF';
+      context.fillStyle = '#26FF26';
       context.fill();
       context.lineWidth = 10;
       context.strokeStyle = '#000000'; 
@@ -320,7 +329,7 @@
     function generateFeatureBubbleBackground(featureText)
     {
         var fontface = "Arial";
-        var fontsize = 18;
+        var fontsize = 28;
         var borderThickness = 4;
         var borderColor = { r:0, g:0, b:0, a:1.0 };
         var backgroundColor = { r:255, g:255, b:255, a:0.8 };
@@ -583,7 +592,7 @@
     function highlightIndicator(featureBubble)
     {
       if(featureBubble != null){
-        featureBubble.indicatorSprite.scale.set(10,10,10);
+        featureBubble.indicatorSprite.scale.set(20,20,20);
         featureBubble.backgroundSprite.scale.set(20,20,20);
       }
     }
@@ -591,7 +600,7 @@
     function dehighlightIndicator(featurebubble)
     {
       if(featurebubble != null){
-        featurebubble.indicatorSprite.scale.set(5,5,5);
+        featurebubble.indicatorSprite.scale.set(10,10,10);
         featurebubble.backgroundSprite.scale.set(10,10,10);
       }
     }
