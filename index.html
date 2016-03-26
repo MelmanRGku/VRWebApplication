@@ -176,7 +176,7 @@
       {
         if(room.links[i].linkSprite == null)
         {
-          var texture = new THREE.Texture( generateLinkSprite(rooms[room.links[i].toId].name) );
+          var texture = new THREE.Texture( generateLinkSprite(rooms[room.links[i].toId].name, false) );
           texture.needsUpdate = true; // important!
           /* Why is this important*/
 
@@ -189,12 +189,29 @@
 
         }
 
+        if(room.links[i].HighlightedLinkSprite == null)
+        {
+          var texture = new THREE.Texture( generateLinkSprite(rooms[room.links[i].toId].name, true) );
+          texture.needsUpdate = true; // important!
+          /* Why is this important*/
+
+          /* Can you apply a texture as a texure map itself?*/
+          var material = new THREE.SpriteMaterial( { map: texture} );
+
+          room.links[i].HighlightedLinkSprite = new THREE.Sprite( material );
+          /* Why scale the sprite link here when you can just increase the size of the canvas */
+          room.links[i].HighlightedLinkSprite.scale.set(30,30,30);
+
+        }
+
+
         var distRadius = 95;
         var theta = toRadians(room.links[i].theta);
         var phi = toRadians(room.links[i].phi);
 
         var cartesianPosition = sphericalToCartesian(distRadius, theta,phi);
 
+        room.links[i].HighlightedLinkSprite.position.set(cartesianPosition.x,cartesianPosition.y,cartesianPosition.z);
         room.links[i].linkSprite.position.set(cartesianPosition.x,cartesianPosition.y,cartesianPosition.z);
         scene.add(room.links[i].linkSprite);
 
@@ -241,7 +258,7 @@
       }
     }
 
-    function generateLinkSprite(roomName)
+    function generateLinkSprite(roomName, isHighlighted)
     {
       var canvas = document.createElement( 'canvas' );
       canvas.width = 512;
@@ -263,6 +280,24 @@
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.fillStyle = '#F0C400';
 
+      var fontface = "Arial";
+      var fontsize = 36;
+      var textColor = { r:0, g:0, b:0, a:1.0 };
+      var borderThickness;
+      var borderColor;
+      var backgroundColor = { r:255, g:255, b:255, a:0.8 };
+
+      if(isHighlighted)
+      {
+        borderColor = { r:255, g:0, b:0, a:1.0 };
+        borderThickness = 10;
+      }
+      else
+      {
+        borderColor = { r:0, g:0, b:0, a:1.0 };
+        borderThickness = 4;
+      }
+
       context.beginPath();
 
       context.moveTo(p1.x, p1.y);
@@ -274,16 +309,9 @@
       context.lineTo(p7.x, p7.y);
       context.closePath();
       context.fill();
-      context.lineWidth = 5;
-      context.strokeStyle = '#000000'; 
+      context.lineWidth = borderThickness;
+      context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
       context.stroke();
-
-        var fontface = "Arial";
-        var fontsize = 36;
-        var borderThickness = 4;
-        var borderColor = { r:0, g:0, b:0, a:1.0 };
-        var textColor = { r:0, g:0, b:0, a:1.0 };
-        var backgroundColor = { r:255, g:255, b:255, a:0.8 };
 
         context.font = "Bold " + fontsize + "px " + fontface;
         var maxWidth = 256;
@@ -578,14 +606,16 @@
     function highlightLinkSprite(link)
     {
       if(link != null){
-        link.linkSprite.scale.set(30,30,30);
+        scene.remove(link.linkSprite);
+        scene.add(link.HighlightedLinkSprite); 
       }
     }
 
     function dehighlightLinkSprite(link)
     {
       if(link != null){
-        link.linkSprite.scale.set(20,20,20);
+        scene.remove(link.HighlightedLinkSprite);
+        scene.add(link.linkSprite); 
       }
     }
 
